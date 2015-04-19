@@ -16,4 +16,11 @@ strut_2 has applied_force = -1000 N
 (This is a crude modelling of 1000 N of load transfer between the struts)
 
 
+~~~ Update Mar 15~~~
+
+Applied force updated as a function of t, with strut 2 having -applied force of strut 1 (to simulate load transfer). Applied force is a ramp up, level, ramp down function.
+
+Added prototype Tkinter animation - TODO need to get this in a proper framed layout with graphs and text-box input params.
+
+
  
