@@ -1,5 +1,6 @@
 # JLW 17 Feb 15 attempt at OOP design for Spring-Mass-Damper model
-# Edit Mar 15 - 
+# Edit Mar 15 -
+# Edit 5 May 15 ~ refactored applied force code
 
 from matplotlib import pyplot as plt
 
@@ -103,6 +104,45 @@ class Suspension():
         #return dict of various values                 
         return{'total_force': self.total_force, 'length' : self.length,
                'time' : elapsed_time, 'force_on_road': self.force_on_road}
+    
+
+###~~~~~~APPLIED FORCE~~~~~~#####
+
+#this array is the applied force to use at each time step
+# needs to have as many indices as there are time steps
+## see also Suspension __init__ where initial applied_force is set to zero for
+## calcSpringEqumLength method (at t=0, spring is at equm length commensurate with the mass)
+
+def setup_applied_force_arr (start1, ramp1, end1, start2, ramp2, end2): 
+    """ force pattern is /^^^^^\ takes all ints, start and end are times in INDICES
+    ramp is slope (Newtons/index), plateau """
+
+    # TODO do I need to define globals for max_time etc here? also check ramps dovetail with plateau    
+    applied_force = [0]*int(max_time/time_step) # Newtons note NEGATIVE is DOWN
+
+    #~~~~~~~~~#set up applied force as func of time, ramp function, level, ramp back down
+    for i in range (start1,end1,1): # (0, 400) RAMPING UP
+
+        applied_force[i] = (-ramp1)*i
+
+    plateau_force = applied_force[end1-1]
+
+    for i in range(end1,start2,1): # PLATEAU at final value of ramp up 
+
+        applied_force[i] = plateau_force
+
+    for i in range (start2,end2,1): #(1500,2000) RAMPING DOWN
+
+        applied_force[i] = plateau_force -(ramp2*(i-start2))
+        
+    #~~~~~~~~~#finished setting up applied_force list
+    
+    print("len of applied force array ", len(applied_force) )
+
+    # placeholder* for second strut taking opposite force to first i.e. as load is transferred
+    opposite_applied_force = [-x for x in applied_force]
+
+    return (applied_force, opposite_applied_force)
 
 
 
@@ -137,7 +177,7 @@ spring_const = 30000 # N/m
 free_length = 1 # m
 
 damper_const_1 = 1000 # N/m/s
-damper_const_2 = 6000
+damper_const_2 = 2000
 
 damp_ratio_1 = damper_const_1/(2*(spring_const*mass)**0.5)
 damp_ratio_2 = damper_const_2/(2*(spring_const*mass)**0.5)
@@ -146,38 +186,21 @@ print("damp_ratio_1", damp_ratio_1)
 print("damp_ratio_2", damp_ratio_2)
                      
 
-###           APPLIED FORCE         #####
-
-#this array is the applied force to use at each time step
-# needs to have as many indices as there are time steps
-## see also Suspension __init__ where initial applied_force is set to zero for
-## calcSpringEqumLength method (at t=0, spring is at equm length commensurate with the mass)
-
-applied_force = [0]*int(max_time/time_step) # Newtons note NEGATIVE is DOWN
-
-#~~~~~~~~~#set up applied force as func of time, ramp function, level, ramp back down
-for i in range (0,500,1):
-
-    applied_force[i] = -4*i
-
-for i in range(500,1500,1):
-
-    applied_force[i] = -2000
-
-for i in range (1500,2000,1):
-
-    applied_force[i] = (-2000 +4*((i)-1500) )
-#~~~~~~~~~#finished setting up applied_force list
-    
-print("len of applied force array ", len(applied_force) )
-
-# placeholder* for second strut taking opposite force to first i.e. as load is transferred
-opposite_applied_force = [-x for x in applied_force]
 
 
-###         TEST THE MODEL WITH SOME SUSPENSION STRUTS  ###
+
+###~~~~~~~~~~~~~~TEST THE MODEL WITH SOME SUSPENSION STRUTS~~~~~~~~~~~~~~~~###
+
+###create applied force arrays
+
+forces = setup_applied_force_arr(0,5,400,1500,-4,2000)
+
+
+applied_force = forces[0]
+opposite_applied_force = forces[1]
 
 ### create some objects to test things with ###
+
 
         ##Suspension(g, mass, vel, applied_force, spring_const, free_length, damper_const)
 strut_1 = Suspension(g, mass, vel, applied_force, spring_const, free_length, damper_const_1)
@@ -197,7 +220,7 @@ lst_length_2 = []
 lst_time_2 = []
 
 
-#     PHYSICS MODEL LOOP       #
+#     PHYSICS MODEL LOOP       # put this as Suspension.physics_loop???
 
 #loop that runs the model, calling calcSuspensionPosition for each time step
 while (elapsed_time < max_time):
