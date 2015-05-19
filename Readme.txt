@@ -25,5 +25,8 @@ Added prototype Tkinter animation - TODO need to get this in a proper framed lay
 ~~~ Update 5 May 15 ~~~
 Minor refactoring of applied force
 
+~~~ Update 19 May 15 ~~~
+Refactored into separate modules.  Clarity somewhat improved by this but need to look at globalising some variables, and a lot of improvement/additions needed on OO structure.
+
 
  
