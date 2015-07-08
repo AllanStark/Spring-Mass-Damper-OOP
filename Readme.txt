@@ -19,10 +19,23 @@ Minor refactoring of applied force
 ~~~ Update 19 May 15 ~~~
 Refactored into separate modules.  Clarity somewhat improved by this but need to look at globalising some variables, and a lot of improvement/additions needed on OO structure.
 
-~~~Update 3 June 15 ~~~
-More separation into modules.  smd_config.py used for cross-module globals. Problem with having smd_config.elapsed_time update within physics model loop.  Put elapsed_time as a local in the loop for the time being - need to test cfg updating with a simple example.
+~~~ Update 3 June 15 ~~~
+More separation into modules.  smd_config.py used for cross-module globals. Problem with having smd_config.elapsed_time update within physics model loop.  Put elapsed_time as a local in the loop for the time being - need to test cfg updating with a simple example
 
 GUI - Matplotlib graphs and Tkinter animation now in one window with animate button. 
 
+~~~ Update 18 June 15 ~~~
 
+Physics loop moved into own module, fixed cfg globals updating.
+
+
+TODO:
+
+Tidy up code style, comments etc (pep 8 is now in directory for this purpose)
+
+Integrate inpit parameters into GUI, sliders for spring and damper settings, or text boxes to accept input.
+
+Separate parameters for damper bound and rebound?
+
+Tidy up applied force module? make more presets for force/time profiles e.g. sine input, ramp function?
  

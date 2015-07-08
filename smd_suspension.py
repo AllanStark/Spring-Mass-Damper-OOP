@@ -1,7 +1,8 @@
 #### Spring, Damper, Suspension Classes
 
-import smd_config
-#TODO:need to chase all globals here!
+import smd_cfg
+
+#TODO:test to confirm all cfg globals working here!
 
 class Spring():
     
@@ -54,9 +55,9 @@ class Suspension():
         self.applied_force = applied_force
 
         #global g
-        self.g = smd_config.g # neessary to copy global? no harm but also no need?
+        #self.g = smd_cfg.g # neessary to copy global? no harm but also no need?
 
-        self.gravity_force = self.g * self.mass                 
+        self.gravity_force = smd_cfg.g * self.mass                 
                          
         # length starts at equm length according to spring
         # NOTE APPLIED FORCE SET TO ZERO FOR THIS SPECIFIC FUNC CALL
@@ -64,10 +65,9 @@ class Suspension():
         print("self.length in init", self.length)
 
     # I don't like the name for this method... maybe suspensionTimeStep?
-    def calcSuspensionPosition(self, elapsed_time): #TODO globals
+    def calcSuspensionPosition(self): #TODO check all cfg globals
 
-        #TODO: elapsed time not updating?!??!!? almost like phys loo isn't sending back to config
-        #bodged by using a local
+
         #print("calcSP, time_step", smd_config.time_step, "elapsed_time", elapsed_time)
 
         # calc forces, first find spring and damper forces
@@ -82,7 +82,7 @@ class Suspension():
         # note lookup of specific time's index in applied_force list
         #print("calcSuspensionPosition using applied_force index ", int(elapsed_time/time_step) )
 
-        self.total_force = self.applied_force[int(elapsed_time/smd_config.time_step)]+ self.gravity_force + self.spring_force + self.damper_force
+        self.total_force = self.applied_force[int(smd_cfg.elapsed_time/smd_cfg.time_step)]+ self.gravity_force + self.spring_force + self.damper_force
                             
         self.force_on_road = self.spring_force + self.damper_force
 
@@ -94,17 +94,13 @@ class Suspension():
         #print("accel", self.accel)
 
         # now velocity
-        self.vel = self.vel + (self.accel * smd_config.time_step)
+        self.vel = self.vel + (self.accel * smd_cfg.time_step)
         #print("vel", self.vel)
         
         # now new length
-        self.length = self.length + (self.vel * smd_config.time_step)
-
-        # now update elapsed time NO! NOW UPDATED IN PHYSICS LOOP MODULE
-        #smd_config.elapsed_time = smd_config.time_step + smd_config.elapsed_time
-        #print("elapsed_time inside calcSuspensionPosition", elapsed_time)
+        self.length = self.length + (self.vel * smd_cfg.time_step)
 
         #return dict of various values                 
         return{'total_force': self.total_force, 'length' : self.length,
-               'time' : elapsed_time, 'force_on_road': self.force_on_road}
+               'time' : smd_cfg.elapsed_time, 'force_on_road': self.force_on_road}
     

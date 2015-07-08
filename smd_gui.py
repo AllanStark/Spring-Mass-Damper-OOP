@@ -1,4 +1,4 @@
-##### SMD_GUI
+# smd_gui
 
 """ Suspension length and force plots - matplotlib
     Cartoon - Tkinter Canvas"""
@@ -7,7 +7,7 @@ import tkinter as Tk
 
 from numpy import arange, sin, pi
 
-#matplotlib including mpl into tkinter bits
+# matplotlib including mpl into tkinter bits
 import matplotlib
 matplotlib.use('TkAgg')
 
@@ -20,8 +20,7 @@ from matplotlib.figure import Figure
 
 
 # "internal" import of config (global vars)
-import smd_config
-
+import smd_cfg
 
 
 class SuspPlot():
@@ -84,40 +83,8 @@ class SuspPlot():
         self.toolbar.update()
         #self.canvas._tkcanvas.pack(side=Tk.TOP, fill=Tk.BOTH, expand=1) 
 
-        ##TODO JLW may need to put all this in a frame, frame has self. root as master, then canvas has self. frame as master
+        ##TODO:  may need to put all this in a frame, frame has self. root as master, then canvas has self. frame as master
         ## then in main prog outside of this class, can .pack or .grid the frame as a whole to position everything in one go
-
-####copy of old
-"""def myplot(lst_time_1, lst_length_1, lst_time_2, lst_length_2, lst_force_on_road_1, \
-           lst_force_on_road_2, applied_force, opposite_applied_force):
-
-    plt.figure(1)
-
-    plt.subplot(311)
-    plt.plot(lst_time_1, lst_length_1, "r")
-    plt.plot(lst_time_2, lst_length_2, "b")
-    plt.xlabel("time/s")
-    plt.ylabel("Length /m")
-    plt.title("Suspension Length Plot")
-
-
-    plt.subplot(312)
-    plt.plot(lst_time_1, lst_force_on_road_1, "r")
-    plt.plot(lst_time_2, lst_force_on_road_2, "b")
-    plt.xlabel("time/s")
-    plt.ylabel("Force /N")
-    plt.title("Suspension Force Plot")
-
-    plt.subplot(313)
-    plt.plot(lst_time_1, applied_force, "r")
-    plt.plot(lst_time_2, opposite_applied_force, "b")
-    plt.xlabel("time/s")
-    plt.ylabel("Force /N")
-    plt.title("Applied Force Plot (load transfer etc)")
-
-    plt.show()    """
-
-
 
 
 class SuspDisplay():
@@ -137,10 +104,10 @@ class SuspDisplay():
         self.lst_length_1 = lst_length_1
         self.lst_length_2 = lst_length_2
         #global max_time  #TODO: unnecessary to create "self" version of globals.
-        self.max_time = smd_config.max_time
+        #self.max_time = smd_config.max_time
 
         #global time_step
-        self.time_step = smd_config.time_step
+        #self.time_step = smd_config.time_step
 
 
         # TODO sort these out, class vars, inst vars, what?!?!?
@@ -174,7 +141,7 @@ class SuspDisplay():
         #careful, can't have 1 ms redraw freq, of monitor is not 1000 Hz!!!
         anim_frame_freq = 20 #ms between frame updates
     
-        for index in range(0, int(self.max_time/self.time_step),1): #TODO sort this - globals or not.
+        for index in range(0, int(smd_cfg.max_time/smd_cfg.time_step),1):
 
             if (index%anim_frame_freq == 0):
             
@@ -190,7 +157,7 @@ class SuspDisplay():
                 self.my_canvas.coords(self.body_line, 100, (500-self.susp_length_1), 500, (500-self.susp_length_2))
                 self.my_canvas.update()
 
-        # cmd line interface anim, before gui button coded
+        # OBSOLETE cmd line interface anim, before gui button coded
         #while True:
          #   animate_keypress = input("enter n to quit or any other key to animate")
           #  if(animate_keypress == "n"):

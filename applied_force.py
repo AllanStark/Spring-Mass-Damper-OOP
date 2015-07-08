@@ -1,4 +1,4 @@
-import smd_config
+import smd_cfg
 
 #~~~~~~~ APPLIED FORCE ~~~~~~#
 
@@ -13,10 +13,8 @@ def setup_applied_force_arr (start1, ramp1, end1, start2, ramp2, end2):
     plateau is implied between end1 and start2.  Returns a 2-tuple
     of applied force """
 
-    # TODO  define globals for max_time etc here, then put in own module, import config.
-    #global max_time, time_step
     
-    applied_force = [0]*int(smd_config.max_time/smd_config.time_step) # Newtons note NEGATIVE is DOWN
+    applied_force = [0]*int(smd_cfg.max_time/smd_cfg.time_step) # Newtons note NEGATIVE is DOWN
 
     #~~~~~~~~~#set up applied force as func of time, ramp function, level, ramp back down
     for i in range (start1,end1,1): # (0, 400) RAMPING UP

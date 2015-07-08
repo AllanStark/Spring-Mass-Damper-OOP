@@ -2,7 +2,7 @@
 # Edit Mar 15 -
 # Edit 5 May 15 ~ refactored applied force code
 # Edit 3 June 15 - refactored into more modules, GUI integrated
-
+# Edit 18 June 15 - physics loop moved into own module, fixed cfg globals updating.
 
 import time
 
@@ -10,8 +10,9 @@ import tkinter as Tk
 
 from smd_suspension import *
 import smd_gui
-import smd_config
+import smd_cfg
 from applied_force import setup_applied_force_arr
+from smd_physicsloop import physics_loop
 
 
 
@@ -25,16 +26,13 @@ from applied_force import setup_applied_force_arr
     
 # model will run until max_time sec
 
-smd_config.max_time = 5 #sec
+smd_cfg.max_time = 5 #sec
 
-#TODO: elapsed_time starts at zero... note this updates to smd_config OK!!! But the physics loop didn't
-#problem updating the smd_config module from within a loop?
+smd_cfg.elapsed_time = 0 #sec
 
-smd_config.elapsed_time = 0 #sec
-
-smd_config.time_step = 0.001 #sec
+smd_cfg.time_step = 0.001 #sec
                          
-smd_config.g = -9.81 #gravity accel m/s/s note NEGATIVE because DOWN
+smd_cfg.g = -9.81 #gravity accel m/s/s note NEGATIVE because DOWN
 
 
 
@@ -75,6 +73,7 @@ forces = setup_applied_force_arr(0,10,200,500,-4,1000)
 applied_force = forces[0]
 opposite_applied_force = forces[1]
 
+
 #~~~~~~~~~~ Create 2 struts (Suspension objects) to test things with ~~~~~~~~~~
 
 
@@ -98,70 +97,11 @@ strut_1_data = {'lst_total_force_1':lst_total_force_1, 'lst_force_on_road_1':lst
 lst_total_force_2 = []
 lst_force_on_road_2 = []
 lst_length_2 = []
-lst_time_2 = [] # uneccessary dup;ication... only need one "time" reference
+lst_time_2 = [] # TODO: eliminate uneccessary duplication?.. only need one "time" reference
 
 #strut_2_data = {}
 strut_2_data = {'lst_total_force_2':lst_total_force_2, 'lst_force_on_road_2':lst_force_on_road_2,
                 'lst_length_2':lst_length_2, 'lst_time_2': lst_time_2}
-
-
-#~~~~~~~~~ PHYSICS MODEL LOOP FUNCTION ~~~~~~~~~~~~#
-
-#loop that runs the model, calling calcSuspensionPosition for each time step
-# TODO: couldn't use smd_config.elapsed_time, it wouldn't update? Almost like it wouldn't
-# publish back to the config file while the loop was still running, therefore no update
-# between iterations.
-#     this now uses config.globals, also refactor how it summons struts, pass all struts as a tuple?
-#     Put physics model in own module?
-#      Should make strut_n_data part of Suspenion class?  Then can just pass the strut_n objects
-#      and access the strut_n_data that way.
-
-def physics_loop(strut_1, strut_1_data, strut_2, strut_2_data):
-
-    elapsed_time = 0
-    
-    while (elapsed_time < smd_config.max_time):
-
-        #print("elapsed_time", elapsed_time)
-
-        dct_output_1 = strut_1.calcSuspensionPosition(elapsed_time)
-        #print("dct_output_1", dct_output_1)
-
-        dct_output_2 = strut_2.calcSuspensionPosition(elapsed_time)
-
-        #TODO: this is not updating when smd_config.elasped_time is used FIND OUT WHY?!?!?!?
-        # Therefore I put in a local elapsed_time
-        elapsed_time = elapsed_time + smd_config.time_step
-        #print("Phys Loop elapsed_time", elapsed_time)
-        
-        #print("in Phys Loop, time_step =", smd_config.time_step, type (smd_config.time_step) )
-    
-        #print("dct_output", dct_output)
-
-        # append relevant arrays using output from the dct
-        strut_1_data["lst_total_force_1"].append(dct_output_1['total_force'])
-        strut_1_data["lst_force_on_road_1"].append(dct_output_1['force_on_road'])
-
-        strut_1_data["lst_length_1"].append(dct_output_1['length'])
-        
-        strut_1_data["lst_time_1"].append(dct_output_1['time'])
-
-        # append relevant arrays using output from the dct
-        strut_2_data["lst_total_force_2"].append(dct_output_2['total_force'])
-        strut_2_data["lst_force_on_road_2"].append(dct_output_2['force_on_road'])
-
-        strut_2_data["lst_length_2"].append(dct_output_2['length'])
-
-        strut_2_data["lst_time_2"].append(dct_output_2['time'])
-
-        # update elapsed_time in this loop
-      
-        smd_config.elapsed_time = dct_output_1['time']
-
-    print("physics loop finished")
-
-    return  strut_1_data, strut_2_data
-
 
 
 #~~~~~~~~~~~~ RUN THE PHYSICS LOOP FUNCTION
