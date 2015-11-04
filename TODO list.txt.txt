@@ -1,0 +1,22 @@
+TODO:
+
+***smd_gui DEV***
+
+rationale: animation is now made up of two types of obj
+StrutLine (gets coords from telem)
+BodyLine (gets coords from top of struts in relevant StrutLines
+
+theoretially, animation should run by 
+get telem of latest frame
+set StrutLines
+get top of struts from StrutLine
+set BodyLine
+
+* class StrutLine
+implement getter (to supply body_line with coords) 
+and setter (for when animation updates strut positions)
+
+* class BodyLine
+implement init, getter(?), setter
+
+

@@ -26,67 +26,49 @@ import smd_cfg
 class SuspPlot():
     """ matplotlib plots"""
 
-    #TODO: change the init to blank plot
-        #  then def a new fn which plots telem data from the relevant Suspension.record
+    #TODO: Better to refactor this to accept strut_n_data as args, where can have any
+    # number of struts.  need to get strut_n_data into part of
+    # strut object (instance of Suspension)
+    
+    def __init__(self, strut_1_data, strut_2_data, applied_force, opposite_applied_force, root):
 
-                      #(arr, arr, arr, tk frame)
-    def __init__(self, car, root):
+        self.lst_time_1 = strut_1_data["lst_time_1"]
+        print("len lst_time_1", len(self.lst_time_1))
+              
+        self.lst_length_1 = strut_1_data["lst_length_1"]
+        self.lst_time_2 = strut_2_data["lst_time_2"]
+        self.lst_length_2 = strut_2_data["lst_length_2"]
+        self.lst_force_on_road_1 = strut_1_data["lst_force_on_road_1"]
+        self.lst_force_on_road_2 = strut_2_data["lst_force_on_road_2"]
+        self.applied_force = applied_force
+        print("len applied_force", len(self.applied_force))
+        self.opposite_applied_force = opposite_applied_force
 
-                     
-        self.all_struts = car.all_struts
-        self.applied_force = car.applied_force
-        self.opposite_applied_force = car.opposite_applied_force
-
-        #TODO: check, is this iffy, cleaner way possible?
-        self.lst_of_applied_forces = [self.applied_force, self.opposite_applied_force]
         self.root = root
 
         self.my_frame = Tk.Frame (self.root, width = 600, height = 400, background = "white") ##TODO - check this is displaying
 
         self.f = Figure(figsize=(5,4), dpi=100)
-        self.a = self.f.add_subplot(311) #length vs time
-        self.b = self.f.add_subplot(312) #force on road vs time
-        self.c = self.f.add_subplot(313) #app force vs time
+        self.a = self.f.add_subplot(311)
+        self.b = self.f.add_subplot(312)
+        self.c = self.f.add_subplot(313)
 
-        self.lst_of_colours = ["r", "b"]
-        self.i = 0
-        for strut in self.all_struts:
-            self.a.plot(strut.record["time"], strut.record["length"], self.lst_of_colours[self.i])
-            self.i = self.i+1
-        
-
+        self.a.plot(self.lst_time_1, self.lst_length_1, "r")
+        self.a.plot(self.lst_time_2, self.lst_length_2, "b")
         self.a.set_xlabel("time/s") 
         self.a.set_ylabel("Length /m")
         self.a.set_title("Suspension Length Plot")
 
 
-        self.i = 0
-        for strut in self.all_struts:
-            self.b.plot(strut.record["time"], strut.record["force_on_road"], self.lst_of_colours[self.i])
-            self.i = self.i+1
-            
+        self.b.plot(self.lst_time_1, self.lst_force_on_road_1, "r")
+        self.b.plot(self.lst_time_2, self.lst_force_on_road_2, "b")
         self.b.set_xlabel("time/s")
         self.b.set_ylabel("Force /N")
         self.b.set_title("Suspension Force Plot")
 
-    
-        self.i = 0
-        for strut in self.all_struts:
-            #DEBUGGING
-            print( "len of time =", len(strut.record["time"]) )
-            print( "len of lst applied forces =", len(self.lst_of_applied_forces[self.i]) )
 
-            #special case when model not yet run (i.e. program first opened)
-            #plot 0,0 i.e. nothing proper, jsut on epoint on origin
-            if len(strut.record["time"]) != len(self.lst_of_applied_forces[self.i]):
-                print("lists in smd_gui not same length to plot")
-                
-                    
-            else:     
-                self.c.plot(strut.record["time"], self.lst_of_applied_forces[self.i], self.lst_of_colours[self.i])
-
-            self.i = self.i+1
-        
+        self.c.plot(self.lst_time_1, self.applied_force, "r")
+        self.c.plot(self.lst_time_2, self.opposite_applied_force, "b")
         self.c.set_xlabel("time/s")
         self.c.set_ylabel("Force /N")
         self.c.set_title("Applied Force Plot (load transfer etc)")
@@ -108,16 +90,19 @@ class SuspPlot():
 class SuspDisplay():
     """TKinter cartoon of 2 suspension struts"""
 
-    #TODO: again, pass in array of all struts, init shoudl draw start positins only                                     
+    #TODO: this would be more difficult to refactor, more than 2 struts would
+    #look better with 3D model..... also this only needs the lst_length_n args
+    # could still import strut_n_data and pick the length values from the dict?
+    # or just keep like this as it's aonly 2 args???                                     
 
-    def __init__(self, car, root):
+    def __init__(self, lst_length_1, lst_length_2, root):
 
             #TODO : DONE-CHECK might be better to make things like max_time global between modules
             # can't just "global" this, need a config.py module
             # http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm
         
-        self.all_struts = car.all_struts
-        
+        self.lst_length_1 = lst_length_1
+        self.lst_length_2 = lst_length_2
         #global max_time  #TODO: unnecessary to create "self" version of globals.
         #self.max_time = smd_config.max_time
 
@@ -125,24 +110,15 @@ class SuspDisplay():
         #self.time_step = smd_config.time_step
 
 
-        
-        
+        # TODO sort these out, class vars, inst vars, what?!?!?
+        # at moment have just "selfed" everything - inst vars
         self.root = root
         self.my_frame = Tk.Frame (self.root, width = 600, height = 500)
         
         self.my_canvas = Tk.Canvas(self.my_frame, width = 600, height = 500, background = "white" )
 
-        self.ground_height = 100 # number of pixels for bottom of strut leg line
-
-        self.body_length = 500 # in pix##TODO: follow this up, deleting numbers in expressions, replace with this var
-        self.scale = 200 # scale strut length by this number of pix
-        
-        for strut in self.all_struts:
-            strut.line = StrutLine(strut, self)
-            
-
-            #TODOTODOTODO, similar techinque to input gui each strut "has-a" input box.
-            # in this case, each strut "has-a" visual representation ( a line)
+        self.susp_length_1 = 200*self.lst_length_1[0]
+        self.susp_length_2 = 200*self.lst_length_2[0]
 
         self.susp_line_1 = self.my_canvas.create_line( 100, 500, 100, (500-self.susp_length_1), fill = "red", width = 20 ) 
         self.susp_line_2 = self.my_canvas.create_line( 500, 500, 500, (500-self.susp_length_2), fill = "blue", width = 20 )
@@ -157,7 +133,7 @@ class SuspDisplay():
         self.anim_button.grid(row = 1, column = 0)
 
         
-# TODO: again, import strut1.record etc and plot data from here.
+
     def animate(self): 
 
         #TODO, as above, check if some things best as class vars.
@@ -189,28 +165,3 @@ class SuspDisplay():
             #else:
              #   SuspDisplay.animate(self)
 
-class StrutLine(): # the line that represents a strut in the animation TODO: fully implement
-
-    def __init__ (self, strut, master):
-
-        self.strut = strut
-        self.master = master
-
-        # TODO: clean up temp bodge since matplotlib and tk canvas lines use shorthand or full colour name
-        # maybe a dict in the cfg file "common name - tk name- mpl name" numpy array probably better.
-
-        if self.strut.colour == "r":
-            self.colour = "red"
-        elif strut.colour == "b":
-            self.colour = "blue"
-
-        # TODO: only want x "plus body length if rear strut""
-        #DEBUG - when prog first started, record.["length"] = []
-        print("SMD_GUI strut len =", self.strut.record["length"]) 
-        self.line = self.master.my_canvas.create_line( self.master.ground_height, self.master.body_length,
-                                                       self.master.ground_height, (self.master.scale*(self.master.body_length-self.strut.record["length"][0])),
-                                                       fill = self.colour, width = 20 )
-
-
-        #####need getter and setter etc
-    

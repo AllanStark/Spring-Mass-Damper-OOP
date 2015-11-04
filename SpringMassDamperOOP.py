@@ -15,7 +15,8 @@ from applied_force import setup_applied_force_arr
 from smd_physicsloop import physics_loop
 
 
-
+#TODO: fully implement input gui
+import smd_input_gui
 
 
 ########   RUN THE PROGRAM   #################
@@ -24,7 +25,7 @@ from smd_physicsloop import physics_loop
 
 #~~~~~~~~~~ SET "CROSS-MODULE GLOBAL" CONFIG PARAMETERS ~~~~~~~~~~~
     
-# model will run until max_time sec
+# generics for phys loop etc
 
 smd_cfg.max_time = 5 #sec
 
@@ -35,31 +36,13 @@ smd_cfg.time_step = 0.001 #sec
 smd_cfg.g = -9.81 #gravity accel m/s/s note NEGATIVE because DOWN
 
 
-
-#~~~~~~~~~ Parameters for 2 struts ~~~~~~~~~~
-
-# note these parameters are for a generic setup
-# feel free to use these in the strut_1 and strut_2 objects below
-# or enter individual argiments for each object as you wish
-
-mass = 300 #kg
-
-vel = 0 #m/s
-
-spring_const = 30000 # N/m
-
-free_length = 1 # m
-
-damper_const_1 = 1500 # N/m/s
-damper_const_2 = 4000
-
-damp_ratio_1 = damper_const_1/(2*(spring_const*mass)**0.5)
-damp_ratio_2 = damper_const_2/(2*(spring_const*mass)**0.5)
-
-print("damp_ratio_1", damp_ratio_1)
-print("damp_ratio_2", damp_ratio_2)
-                     
-
+# default strut values (for when prog first opens- all struts have these values)
+smd_cfg.df_mass = 300 # kg mass on strut
+smd_cfg.df_fl = 1     # m length
+smd_cfg.df_sr = 40000 # N/m spring rate
+smd_cfg.df_dc = 1000 # N/m/s damper constant
+smd_cfg.df_vel = 0 # m/s initial strut velocity
+smd_cfg.wheelbase = 1.5 # m wheelbase
 
 
 
@@ -74,60 +57,42 @@ applied_force = forces[0]
 opposite_applied_force = forces[1]
 
 
-#~~~~~~~~~~ Create 2 struts (Suspension objects) to test things with ~~~~~~~~~~
-
-
-        ##Suspension( mass, vel, applied_force, spring_const, free_length, damper_const)
-strut_1 = Suspension( mass, vel, applied_force, spring_const, free_length, damper_const_1)
-strut_2 = Suspension( mass, vel, opposite_applied_force, spring_const, free_length, damper_const_2) 
-
-### output params in list (time step increments, each index is a new time step)
-#in future make these part of the Suspension class?
-#would save need for repetitive typing?
-lst_total_force_1 = []
-lst_force_on_road_1 = []
-lst_length_1 = []
-lst_time_1 = []
-
-#strut_1_data = {} #summarises all "lst_foo" above, for this strut 
-
-strut_1_data = {'lst_total_force_1':lst_total_force_1, 'lst_force_on_road_1':lst_force_on_road_1,
-                'lst_length_1':lst_length_1, 'lst_time_1': lst_time_1}
-
-lst_total_force_2 = []
-lst_force_on_road_2 = []
-lst_length_2 = []
-lst_time_2 = [] # TODO: eliminate uneccessary duplication?.. only need one "time" reference
-
-#strut_2_data = {}
-strut_2_data = {'lst_total_force_2':lst_total_force_2, 'lst_force_on_road_2':lst_force_on_road_2,
-                'lst_length_2':lst_length_2, 'lst_time_2': lst_time_2}
-
-
-#~~~~~~~~~~~~ RUN THE PHYSICS LOOP FUNCTION
-
-strut_1_data, strut_2_data = physics_loop(strut_1,strut_1_data, strut_2, strut_2_data)
+#~~~~~~~~~~ Create HalfCar( 2 struts (Suspension objects) to test things with ~~~~~~~~~~
+my_halfcar = HalfCar(smd_cfg.wheelbase, "r", "b", applied_force, opposite_applied_force)
+#TODO: get default values from inputGUI?
+        ##Suspension( str name, str colour for mpl representations,  arr applied_force):
 
 
 
-#~~~~~~~~~~~~ Run the GUI function
+
+
+#~~~~~~~~~~~~ INITIALISE ALL GUI COMPONENTS
+# TODO: need to change args to default plots here!!!!
+# should this mainloop be in a separate file or class?
+# also how do i run mainloop but keep doing other things - threading READ UP?
 
 #open a TKinter root window
 root = Tk.Tk()
 
-#call the plots
+#call the plots #TODO: pass in my_halfcar etc... get all_struts that way
+# Pass in my_halfcar.all_struts, or whole of my_halfcar? depends on scope of fn.
+my_ParamsDisplay = smd_input_gui.GUIParamsDisplay(root, my_halfcar.all_struts) #TODO: check
 
-my_SuspPlot = smd_gui.SuspPlot(strut_1_data, strut_2_data, applied_force, opposite_applied_force, root)
+my_ParamsDisplay.my_frame.grid( row = 0, column = 1)
 
-my_SuspPlot.my_frame.grid(row = 0, column = 0)
+#TODO: update now using HalofCar class??????
+my_SuspPlot = smd_gui.SuspPlot(my_halfcar, root)
+
+my_SuspPlot.my_frame.grid(row = 0, column = 0, rowspan = 2)
 
 # create the suspdisplay (cartoon) object, call its animate func
 
-my_SuspDisplay = smd_gui.SuspDisplay(strut_1_data["lst_length_1"], strut_2_data["lst_length_2"], root)
+#TODO: update now the data is prat of the strut obj.  Also what should this plot as df??????
+my_SuspDisplay = smd_gui.SuspDisplay(my_halfcar, root) #Todo: ADJUST ARGs IN SMD_GUI
 
-my_SuspDisplay.my_frame.grid (row = 0, column = 1)
+my_SuspDisplay.my_frame.grid (row = 1, column = 1)
 
-my_SuspDisplay.animate()
+#my_SuspDisplay.animate()
 
 root.mainloop()
 

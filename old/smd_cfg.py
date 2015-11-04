@@ -1,4 +1,4 @@
-# smd_cfg.py
+# smd_config.py
 
 # define all globals
 
@@ -12,12 +12,3 @@ elapsed_time = 123  # problems with this updating to zero, but not updating
                     # in physics loop cycle?!?!?
 time_step = 123
 g = 123
-
-# default values (for when prog first opens- all struts have these values)
-df_mass = 300 # kg mass on strut
-df_fl = 1     # m length
-df_sr = 40000 # N/m spring rate
-df_dc = 1000 # N/m/s damper constant
-df_vel = 0 # m/s initial strut vel
-
-wheelbase = 666 #m wheelbase

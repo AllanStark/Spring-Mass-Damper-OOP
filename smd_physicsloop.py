@@ -9,47 +9,31 @@
 
 import smd_cfg
 
-def physics_loop(strut_1, strut_1_data, strut_2, strut_2_data):
+## (LIST all_struts [Suspension OBJECTS]), 
+def physics_loop(all_struts):
 
     smd_cfg.elapsed_time = 0
     print("In phys loop, initial elapsed time = ", smd_cfg.elapsed_time)
     
     while (smd_cfg.elapsed_time < smd_cfg.max_time): # would a for loop help the cfg to update?
 
-        #print("Start of Phys Loop cycle, elapsed_time", smd_cfg.elapsed_time)
+        #TODO - record telemetry needs implementing in Suspension class
+        for strut in all_struts:
 
-        dct_output_1 = strut_1.calcSuspensionPosition()
-        #print("dct_output_1", dct_output_1)
+            #do physics loop
+            telem = strut.calcSuspensionPosition()
 
-        dct_output_2 = strut_2.calcSuspensionPosition()
+            #TODOTODOTODO
+            strut.record['total_force'].append(telem['total_force'])
+            strut.record['force_on_road'].append(telem['force_on_road'])
+            strut.record['length'].append(telem['length'])
+            strut.record['vel'].append(telem['vel'])
+            #time is appended from inside calcSuspensionPosition should I use global directly here instead?
+            strut.record['time'].append(telem['time']) #
 
-        #TODO: this is not updating when smd_config.elasped_time is used FIND OUT WHY?!?!?!?
-        # Therefore I put in a local elapsed_time
-        
+        # now all struts done, time step has finished, so incr time
         smd_cfg.elapsed_time = smd_cfg.elapsed_time + smd_cfg.time_step
         #print("In Phys Loop, updated elapsed time to", smd_cfg.elapsed_time)
         
-        #print("in Phys Loop, time_step =", smd_cfg.time_step, type (smd_cfg.time_step) )
-    
-        #print("dct_output", dct_output)
-
-        # append relevant arrays using output from the dct
-        strut_1_data["lst_total_force_1"].append(dct_output_1['total_force'])
-        strut_1_data["lst_force_on_road_1"].append(dct_output_1['force_on_road'])
-
-        strut_1_data["lst_length_1"].append(dct_output_1['length'])
-        
-        strut_1_data["lst_time_1"].append(dct_output_1['time'])
-
-        # append relevant arrays using output from the dct
-        strut_2_data["lst_total_force_2"].append(dct_output_2['total_force'])
-        strut_2_data["lst_force_on_road_2"].append(dct_output_2['force_on_road'])
-
-        strut_2_data["lst_length_2"].append(dct_output_2['length'])
-
-        strut_2_data["lst_time_2"].append(dct_output_2['time'])
-        
-        
     print("physics loop finished")
 
-    return  strut_1_data, strut_2_data

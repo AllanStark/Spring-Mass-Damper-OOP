@@ -68,18 +68,15 @@ class Damper():
 
 # car suspension strut, collection of Spring, mass, Damper
 class Suspension():
-    #Suspension( str name, str colour for tk representations,  arr applied_force):
-    def __init__(self, name, colour, applied_force):
+                    # flt, flt, array[floats], flt, flt, flt
+    def __init__(self, mass, vel, applied_force, spring_const, free_length, damper_const):
 
-        self.name = name # string, eg "F", "R". this is used to pass to GUI labels
-        self.colour = colour
-        
-        self.mass = smd_cfg.df_mass
+        self.mass = mass
 
         # Suspension object inits its own Spring and Damper objects                 
-        self.spring = Spring(smd_cfg.df_sr, smd_cfg.df_fl) ### default values
-        self.damper = Damper(smd_cfg.df_dc)
-        self.vel = smd_cfg.df_vel
+        self.spring = Spring(spring_const, free_length) ### should object name be capital "Spring"
+        self.damper = Damper(damper_const)
+        self.vel = vel
         self.applied_force = applied_force
 
         #global g
@@ -93,16 +90,8 @@ class Suspension():
         print("self.length in init", self.length)
 
         #TODO: fully implement this dict as a way to record phys model output 
-        self.record = {"length":[], "total_force":[], "force_on_road":[], "vel":[], "time":[]}
+        self.record = {"length":[], "force":[], "vel":[], "time":[]}
 
-        #TODO, put time = 0 defaults manualy into array here? else plots don;t have anything to read from
-        telem = self.calcSuspensionPosition()
-
-        for key in telem:
-            value = telem[key] ###TODOTODO
-            self.record[key].append(value)
-        
-        
     # I don't like the name for this method... maybe suspensionTimeStep?
     def calcSuspensionPosition(self): #TODO check all cfg globals
 
@@ -120,10 +109,8 @@ class Suspension():
         # now find resultant of all forcces
         # note lookup of specific time's index in applied_force list
         #print("calcSuspensionPosition using applied_force index ", int(elapsed_time/time_step) )
-        
-        self.applied_force_now = self.applied_force[int(smd_cfg.elapsed_time/smd_cfg.time_step)]
-        
-        self.total_force = self.applied_force_now + self.gravity_force + self.spring_force + self.damper_force
+
+        self.total_force = self.applied_force[int(smd_cfg.elapsed_time/smd_cfg.time_step)]+ self.gravity_force + self.spring_force + self.damper_force
                             
         self.force_on_road = self.spring_force + self.damper_force
 
@@ -142,34 +129,6 @@ class Suspension():
         self.length = self.length + (self.vel * smd_cfg.time_step)
 
         #return dict of various values                 
-        telem = {'total_force': self.total_force, 'length' : self.length, 'vel' : self.vel,
+        return{'total_force': self.total_force, 'length' : self.length,
                'time' : smd_cfg.elapsed_time, 'force_on_road': self.force_on_road}
-
-        return telem
-
-#TODO: implement as superclass, then subs are 2-wheel chassis, 4 wh chassis     
-class Chassis(): # "abstract parent class"
-    pass
-
-class HalfCar(Chassis):
-
-    def __init__(self, wheelbase, fcolour, rcolour,
-                 applied_force, opposite_applied_force):
-
-        self.wheelbase = wheelbase
-        self.fcolour = fcolour
-        self.rcolour = rcolour
-        self.applied_force = applied_force
-        self.opposite_applied_force = opposite_applied_force
-
-        #create struts at F&R extremity of wheelbase
-
-        self.front_st = Suspension( "F", self.fcolour, self.applied_force)
-        self.rear_st = Suspension( "R", self.rcolour, self.opposite_applied_force)
-            
-        self.all_struts = [self.front_st, self.rear_st] 
-
-        
-        
-
     
