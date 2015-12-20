@@ -68,11 +68,12 @@ class Damper():
 
 # car suspension strut, collection of Spring, mass, Damper
 class Suspension():
-    #Suspension( str name, str colour for tk representations,  arr applied_force):
-    def __init__(self, name, colour, applied_force):
+    #Suspension( str name, str colour for tk representations,  arr applied_force, bool ):
+    def __init__(self, name, colour, applied_force, is_rear):
 
         self.name = name # string, eg "F", "R". this is used to pass to GUI labels
         self.colour = colour
+        self.is_rear = is_rear
         
         self.mass = smd_cfg.df_mass
 
@@ -95,12 +96,18 @@ class Suspension():
         #TODO: fully implement this dict as a way to record phys model output 
         self.record = {"length":[], "total_force":[], "force_on_road":[], "vel":[], "time":[]}
 
-        #TODO, put time = 0 defaults manualy into array here? else plots don;t have anything to read from
+        #TODO, put time = 0 defaults manualy into array here? else plots don't have anything to read from
         telem = self.calcSuspensionPosition()
 
         for key in telem:
             value = telem[key] ###TODOTODO
             self.record[key].append(value)
+
+    def blank_all_records(self):
+        # replaces record dict with blank - used to scrub all results from previous physics model
+        # in order to then run a new one 
+        self.record = {"length":[], "total_force":[], "force_on_road":[], "vel":[], "time":[]}
+        
         
         
     # I don't like the name for this method... maybe suspensionTimeStep?
@@ -147,6 +154,18 @@ class Suspension():
 
         return telem
 
+
+    ##### TODO Nov 15: test this!!!
+    def set_strut_params(self, params):
+        ### params = {"mass":, "free_length":, "spring_rate":, "damp_const":}
+        print("updating strut params in Suspension")
+        self.mass = params["mass"]
+
+        self.spring.set_params(params["spring_rate"], params["free_length"])
+
+        self.damper.set_DC(params["damp_const"])     
+
+
 #TODO: implement as superclass, then subs are 2-wheel chassis, 4 wh chassis     
 class Chassis(): # "abstract parent class"
     pass
@@ -164,12 +183,12 @@ class HalfCar(Chassis):
 
         #create struts at F&R extremity of wheelbase
 
-        self.front_st = Suspension( "F", self.fcolour, self.applied_force)
-        self.rear_st = Suspension( "R", self.rcolour, self.opposite_applied_force)
+        self.front_st = Suspension( "F", self.fcolour, self.applied_force, False)
+        self.rear_st = Suspension( "R", self.rcolour, self.opposite_applied_force, True)
             
         self.all_struts = [self.front_st, self.rear_st] 
 
         
         
-
+# TODO Nov 15, create setter fn that takes output from inpit_gui getter fn, passes params to each strut's setter fn
     

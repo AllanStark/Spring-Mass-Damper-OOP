@@ -21,3 +21,10 @@ df_dc = 1000 # N/m/s damper constant
 df_vel = 0 # m/s initial strut vel
 
 wheelbase = 666 #m wheelbase
+
+# global gui objects to enable cross module comms
+my_ParamsDisplay = None
+my_SuspPlot = None
+
+my_SuspDisplay = None
+

@@ -2,23 +2,28 @@
 
 #loop that runs the model, calling calcSuspensionPosition for each time step
 # TODO: 
-#     Refactor how it summons struts, pass all struts as a tuple?
+#     Refactor how it summons struts, pass all struts as a tuple? DONE
 #     
 #      Should make strut_n_data part of Suspension class?  Then can just pass the strut_n objects
-#      and access the strut_n_data that way.
+#      and access the strut_n_data that way. DONE
 
 import smd_cfg
 
-## (LIST all_struts [Suspension OBJECTS]), 
-def physics_loop(all_struts):
 
+## (LIST all_struts [Suspension OBJECTS]), 
+def physics_loop(car):
+
+    #TODO - is this best placed here???scrub all of any prev phys loop results to give this loop a clean slate
+    for strut in car.all_struts:
+        strut.blank_all_records()
+        
     smd_cfg.elapsed_time = 0
     print("In phys loop, initial elapsed time = ", smd_cfg.elapsed_time)
     
     while (smd_cfg.elapsed_time < smd_cfg.max_time): # would a for loop help the cfg to update?
 
         #TODO - record telemetry needs implementing in Suspension class
-        for strut in all_struts:
+        for strut in car.all_struts:
 
             #do physics loop
             telem = strut.calcSuspensionPosition()

@@ -10,12 +10,13 @@ import tkinter as Tk
 
 # "internal" import of config (global vars)
 import smd_cfg
+import smd_physicsloop
 
 ### TODO: prototype for input parameters GUI
     
 class GUIParamsDisplay():
 
-    def __init__ (self, root, all_struts):
+    def __init__ (self, root, car):
 
         self.root = root
 
@@ -42,7 +43,8 @@ class GUIParamsDisplay():
 
         # CENTRE frames for individual struts with param values
         #TODO: take this from global?array to hold all struts
-        self.all_struts = all_struts
+        self.car = car
+        self.all_struts = car.all_struts
 
         for strut in self.all_struts: #array of all strut objects
 
@@ -67,7 +69,8 @@ class GUIParamsDisplay():
         #Button to confirm input values
 
         self.params_confirm_btn = Tk.Button(master = self.my_frame, text = "Commit",
-                                            height = 3, width = 6, command = self.get_all_strut_params)
+                                            height = 3, width = 6, command = self.update_all_strut_params)
+        self.params_confirm_btn.grid( row = 0, column = 4)
 
         # grid  all sub-frames (side by side)
 
@@ -83,16 +86,25 @@ class GUIParamsDisplay():
             
         self.unit_frame.grid( row = 0, column = 3)
 
-    def get_all_strut_params(self): #TODO, do I need to pass all vars?  or does self imply all associated
+    def update_all_strut_params(self): #TODO, do I need to pass all vars?  or does self imply all associated
 
         all_strut_params = []
         for strut in self.all_struts:
 
-            strut_params = strut.get_strut_params()
-            all_strut_params.append(strut_params)
+            #get
+            strut_params = strut.GUIParams.get_strut_params()
+            #set (fn in Suspension)
+            strut.set_strut_params(strut_params)
 
-        return all_strut_params   # note, need to reconcile this with array "all_struts"
-               #TODO: would be nice to have as a dict of dicts i.e. {"strut1params":{strut_params}, "strut2params"...etc}
+            # TODOset the SuspDisplay cartoon here, or wait until after phys model?
+
+        smd_physicsloop.physics_loop(self.car)
+        # TODO, potentially set the SuspDiaplay cartoon here to starting values from the phys model run.
+
+        # Telemetry graphs, clear all old plots and then plot current telem
+        smd_cfg.my_SuspPlot.clear_telem() 
+        smd_cfg.my_SuspPlot.plot_telem() # TODO; not plotting!
+       
 
         
 #TODO: have this as part of strut object - now no need, it's linked to strut object?

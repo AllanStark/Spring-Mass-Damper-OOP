@@ -26,7 +26,7 @@ import smd_input_gui
 #~~~~~~~~~~ SET "CROSS-MODULE GLOBAL" CONFIG PARAMETERS ~~~~~~~~~~~
     
 # generics for phys loop etc
-
+ 
 smd_cfg.max_time = 5 #sec
 
 smd_cfg.elapsed_time = 0 #sec
@@ -53,11 +53,13 @@ smd_cfg.wheelbase = 1.5 # m wheelbase
 forces = setup_applied_force_arr(0,10,200,500,-4,1000)
 
 
+#TODO: put into global cfg?
 applied_force = forces[0]
 opposite_applied_force = forces[1]
 
 
 #~~~~~~~~~~ Create HalfCar( 2 struts (Suspension objects) to test things with ~~~~~~~~~~
+## TODO : put into global cfg
 my_halfcar = HalfCar(smd_cfg.wheelbase, "r", "b", applied_force, opposite_applied_force)
 #TODO: get default values from inputGUI?
         ##Suspension( str name, str colour for mpl representations,  arr applied_force):
@@ -73,24 +75,25 @@ my_halfcar = HalfCar(smd_cfg.wheelbase, "r", "b", applied_force, opposite_applie
 
 #open a TKinter root window
 root = Tk.Tk()
+print("Tk window opened")
 
 #call the plots #TODO: pass in my_halfcar etc... get all_struts that way
 # Pass in my_halfcar.all_struts, or whole of my_halfcar? depends on scope of fn.
-my_ParamsDisplay = smd_input_gui.GUIParamsDisplay(root, my_halfcar.all_struts) #TODO: check
+smd_cfg.my_ParamsDisplay = smd_input_gui.GUIParamsDisplay(root, my_halfcar) #TODO: check
 
-my_ParamsDisplay.my_frame.grid( row = 0, column = 1)
+smd_cfg.my_ParamsDisplay.my_frame.grid( row = 0, column = 1)
 
 #TODO: update now using HalofCar class??????
-my_SuspPlot = smd_gui.SuspPlot(my_halfcar, root)
+smd_cfg.my_SuspPlot = smd_gui.SuspPlot(my_halfcar, root)
 
-my_SuspPlot.my_frame.grid(row = 0, column = 0, rowspan = 2)
+smd_cfg.my_SuspPlot.my_frame.grid(row = 0, column = 0, rowspan = 2)
 
 # create the suspdisplay (cartoon) object, call its animate func
 
 #TODO: update now the data is prat of the strut obj.  Also what should this plot as df??????
-my_SuspDisplay = smd_gui.SuspDisplay(my_halfcar, root) #Todo: ADJUST ARGs IN SMD_GUI
+smd_cfg.my_SuspDisplay = smd_gui.SuspDisplay(my_halfcar, root) #Todo: ADJUST ARGs IN SMD_GUI
 
-my_SuspDisplay.my_frame.grid (row = 1, column = 1)
+smd_cfg.my_SuspDisplay.my_frame.grid (row = 1, column = 1)
 
 #my_SuspDisplay.animate()
 

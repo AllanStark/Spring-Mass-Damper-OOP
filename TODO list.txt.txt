@@ -19,4 +19,30 @@ and setter (for when animation updates strut positions)
 * class BodyLine
 implement init, getter(?), setter
 
+TODO 20/12/15
 
+Program structure - keep phys model and anim separate.
+within input gui, have "calculate" button which sends input_gui values to phys model, and calculates
+- HALF DONE, values send but at moment phys model doesn't run - simple to add in. **20/12/15 this appears done in code?
+
+within suspension cartoon, point animate button at animate function is done currently
+BUT write case for no phys model run yet i.e. do nothing as nothing to animate. DONE Dec 15
+
+Need to implement setter fns in HalfCar and Suspension classes, which will take output from 
+the getter fn in input_gui.  This will allow phys model to update when nuew suspension details input. DONE
+
+Will also need a setter fn in the SuspDisplay etc lower classes. DONE - need to consider replotting initial 
+conditions but the animation appears to work, albeit a bit "jumpy" on firing.  Check to see if this is linked to the plotting irregularities below.
+
+"                                " SuspPlot - the clear and plot functions basically do this, however 
+updating of visuals is buggy, requires mouseover graphs to kick in the update graphically.
+also need to test that update is actually true, sometimes it seems partial i.e has it mixed some old 
+data from physics model??? need to test thoroughly. 
+
+It would appear from graphs and anim that starting values of phys model do not update the first time.
+I.e. start with length 1 m, runs OK, change to 0.7 m, initial value is still 1 m at t = 0 but then becomes 0.7 m.
+when 0.7 m is set again, then teh starting value is 0.7 m.  So check index zero in arrays, could be an off by one error? Or somehow picking up last value of array which is also usually close to natural length of spring.
+ 
+
+Review all "TODOs" above and also in code comments, some have been implemeted but the TODOs not deleted.  
+Clean this up!!!
