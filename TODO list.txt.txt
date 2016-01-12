@@ -46,3 +46,8 @@ when 0.7 m is set again, then teh starting value is 0.7 m.  So check index zero 
 
 Review all "TODOs" above and also in code comments, some have been implemeted but the TODOs not deleted.  
 Clean this up!!!
+
+11 Jan 16 - started using PyCharm
+Solved graph not updating with new spring length. New free length was being calculated but equm length was not.  This is now fixed.
+
+TODO: However the cartoon is not updating the new strut lengths (until animate is clicked).  probably no function was ever defined for this.

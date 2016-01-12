@@ -1,10 +1,10 @@
-#smd_input_gui.
-# TODO: not yet included in main program
+# smd_input_gui.
+
 # TODO: setter functions
 
 #REF
 # http://effbot.org/tkinterbook/grid.htm
-#gets user input values for strut parameters 
+# gets user input values for strut parameters
 
 import tkinter as Tk
 
@@ -12,9 +12,8 @@ import tkinter as Tk
 import smd_cfg
 import smd_physicsloop
 
-### TODO: prototype for input parameters GUI
-    
 class GUIParamsDisplay():
+    # Master frame for gui that holds user input parameters
 
     def __init__ (self, root, car):
 
@@ -48,7 +47,7 @@ class GUIParamsDisplay():
 
         for strut in self.all_struts: #array of all strut objects
 
-            #create the gui strip of param entry boxes for each
+            # create the gui frame holding param entry boxes for each strut
             strut.GUIParams = GUIParamsForAStrut(strut, self.my_frame)
         
         # paramter unit label - RH frame with units
@@ -91,24 +90,24 @@ class GUIParamsDisplay():
         all_strut_params = []
         for strut in self.all_struts:
 
-            #get
+            # get
             strut_params = strut.GUIParams.get_strut_params()
-            #set (fn in Suspension)
+            # set (fn in Suspension)
             strut.set_strut_params(strut_params)
 
-            # TODOset the SuspDisplay cartoon here, or wait until after phys model?
+            # TODO set the SuspDisplay cartoon here, or wait until after phys model?
 
         smd_physicsloop.physics_loop(self.car)
         # TODO, potentially set the SuspDiaplay cartoon here to starting values from the phys model run.
 
         # Telemetry graphs, clear all old plots and then plot current telem
         smd_cfg.my_SuspPlot.clear_telem() 
-        smd_cfg.my_SuspPlot.plot_telem() # TODO; not plotting!
-       
+        smd_cfg.my_SuspPlot.plot_telem() # TODO; not plotting until mouseover graph area!
 
-        
-#TODO: have this as part of strut object - now no need, it's linked to strut object?
+
 class GUIParamsForAStrut():
+    # This is a frame for a strut's parameters with input text boxes, labels etc.
+    # Several of these can sit in the overall frame
 
     def __init__ (self, strut, root):
 
@@ -120,7 +119,7 @@ class GUIParamsForAStrut():
 
         # TODO: check - get values from actual strut object
         self.mass = strut.mass # kg
-        self.fl = strut.spring.get_params()[1] # m 
+        self.fl = strut.spring.get_params()[1] # m
         self.sr = strut.spring.get_params()[0] # N/m
         self.dc = strut.damper.get_DC()  # N/m/s
         
@@ -158,9 +157,4 @@ class GUIParamsForAStrut():
 
 
 
-##TESTING TODO: delete this when incorporated into main prog#########
-#window = Tk.Tk()
 
-##create ParamsDisplay
-
-#my_ParamsDisplay = ParamsDisplay(window)

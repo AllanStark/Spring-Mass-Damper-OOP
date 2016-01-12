@@ -90,7 +90,7 @@ smd_cfg.my_SuspPlot.my_frame.grid(row = 0, column = 0, rowspan = 2)
 
 # create the suspdisplay (cartoon) object, call its animate func
 
-#TODO: update now the data is prat of the strut obj.  Also what should this plot as df??????
+#TODO: update now the data is part of the strut obj.  Also what should this plot as df??????
 smd_cfg.my_SuspDisplay = smd_gui.SuspDisplay(my_halfcar, root) #Todo: ADJUST ARGs IN SMD_GUI
 
 smd_cfg.my_SuspDisplay.my_frame.grid (row = 1, column = 1)

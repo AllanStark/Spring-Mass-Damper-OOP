@@ -1,6 +1,6 @@
 #~~~~~~~~~ PHYSICS MODEL LOOP FUNCTION ~~~~~~~~~~~~#
 
-#loop that runs the model, calling calcSuspensionPosition for each time step
+# loop that runs the model, calling calcSuspensionPosition for each time step
 # TODO: 
 #     Refactor how it summons struts, pass all struts as a tuple? DONE
 #     
@@ -10,10 +10,10 @@
 import smd_cfg
 
 
-## (LIST all_struts [Suspension OBJECTS]), 
+# (LIST all_struts [Suspension OBJECTS]),
 def physics_loop(car):
 
-    #TODO - is this best placed here???scrub all of any prev phys loop results to give this loop a clean slate
+    # TODO - is this best placed here???scrub all of any prev phys loop results to give this loop a clean slate
     for strut in car.all_struts:
         strut.blank_all_records()
         
@@ -22,23 +22,26 @@ def physics_loop(car):
     
     while (smd_cfg.elapsed_time < smd_cfg.max_time): # would a for loop help the cfg to update?
 
-        #TODO - record telemetry needs implementing in Suspension class
+        # TODO - record telemetry needs implementing in Suspension class
         for strut in car.all_struts:
 
-            #do physics loop
+            # do physics loop
             telem = strut.calcSuspensionPosition()
 
-            #TODOTODOTODO
+            # TODOTODOTODO
             strut.record['total_force'].append(telem['total_force'])
             strut.record['force_on_road'].append(telem['force_on_road'])
             strut.record['length'].append(telem['length'])
             strut.record['vel'].append(telem['vel'])
-            #time is appended from inside calcSuspensionPosition should I use global directly here instead?
+            # time is appended from inside calcSuspensionPosition should I use global directly here instead?
             strut.record['time'].append(telem['time']) #
 
         # now all struts done, time step has finished, so incr time
         smd_cfg.elapsed_time = smd_cfg.elapsed_time + smd_cfg.time_step
-        #print("In Phys Loop, updated elapsed time to", smd_cfg.elapsed_time)
+        # print("In Phys Loop, updated elapsed time to", smd_cfg.elapsed_time)
+
         
     print("physics loop finished")
+    print("len of record", len(strut.record['length']))
+    print("index 0 in record['length']", strut.record['length'][0])
 

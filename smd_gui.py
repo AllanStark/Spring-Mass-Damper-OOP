@@ -90,11 +90,19 @@ class SuspPlot():
             self.a.plot(strut.record["time"], strut.record["length"], self.lst_of_colours[self.i])
             self.i = self.i+1
 
+        self.a.set_xlabel("time/s")
+        self.a.set_ylabel("Length /m")
+        self.a.set_title("Suspension Length Plot")
+
         # Populate sublot b (F on road vs time)
         self.i = 0
         for strut in self.all_struts:
             self.b.plot(strut.record["time"], strut.record["force_on_road"], self.lst_of_colours[self.i])
             self.i = self.i+1
+
+        self.b.set_xlabel("time/s")
+        self.b.set_ylabel("Force /N")
+        self.b.set_title("Suspension Force Plot")
 
         # Populate subplot c (app F vs time)
         self.i = 0
@@ -102,7 +110,11 @@ class SuspPlot():
             self.c.plot(strut.record["time"], self.lst_of_applied_forces[self.i], self.lst_of_colours[self.i])
             self.i = self.i+1
 
-        print("finshed plotting telem") # TODO this prints but mpl doesn't always update...
+        self.c.set_xlabel("time/s")
+        self.c.set_ylabel("Force /N")
+        self.c.set_title("Applied Force Plot (load transfer etc)")
+
+        print("finshed plotting telem") # TODO this prints but mpl doesn't always update without mouseover mpl graphs...
 
     def clear_telem(self): # clears all plotted data
         self.a.clear()

@@ -22,6 +22,7 @@ class Spring():
 
         self.free_length = free_length
 
+
     def get_params(self):
 
         spring_params = [self.spring_const, self.free_length]
@@ -155,13 +156,15 @@ class Suspension():
         return telem
 
 
-    ##### TODO Nov 15: test this!!!
+    ##### TODO Nov 15: test this!!! Do I need to calc equm length here?
     def set_strut_params(self, params):
         ### params = {"mass":, "free_length":, "spring_rate":, "damp_const":}
         print("updating strut params in Suspension")
         self.mass = params["mass"]
 
         self.spring.set_params(params["spring_rate"], params["free_length"])
+
+        self.length = self.spring.calcSpringEqumLength(self.gravity_force,self.applied_force[0])##TODO CHECK Jan 16
 
         self.damper.set_DC(params["damp_const"])     
 
